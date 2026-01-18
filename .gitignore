@@ -1,0 +1,83 @@
+# ======================
+# Python
+# ======================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ======================
+# Virtual Environment
+# ======================
+venv/
+env/
+ENV/
+.venv/
+
+# ======================
+# Jupyter Notebook
+# ======================
+.ipynb_checkpoints/
+*.nbconvert.ipynb
+
+# ======================
+# VS Code
+# ======================
+.vscode/
+
+# ======================
+# OS files
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# Logs
+# ======================
+*.log
+
+# ======================
+# Dataset / Images
+# (VERY IMPORTANT for DL projects)
+# ======================
+data/
+dataset/
+datasets/
+output_dataset/
+augmented/
+*.jpg
+*.jpeg
+*.png
+
+# ======================
+# Model files
+# ======================
+*.h5
+*.pt
+*.pth
+*.onnx
+*.joblib
+*.pkl
+
+# ======================
+# TensorFlow / Keras cache
+# ======================
+.tensorflow/
+.keras/
+
+# ======================
+# Temporary files
+# ======================
+temp/
+tmp/
+
+# ======================
+# Kaggle
+# ======================
+kaggle.json
+
+# ======================
+# Environment files
+# ======================
+.env
+.venv
