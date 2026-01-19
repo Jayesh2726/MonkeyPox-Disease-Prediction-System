@@ -45,9 +45,7 @@ dataset/
 datasets/
 output_dataset/
 augmented/
-*.jpg
-*.jpeg
-*.png
+
 
 # ======================
 # Model files
