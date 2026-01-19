@@ -7,8 +7,11 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.7) 0%, rgba(118, 75, 162, 0.7) 100%), url('https://drive.google.com/file/d/16QMHPfkCVx7UeFiRQ4P4yrYn-o8r8J2m/view?usp=drive_link') center/cover no-repeat;
+    background-image: url('../images/Monkeypox\ Background.jpg');
+    background-size: cover;
+    background-position: center;
     background-attachment: fixed;
+    background-color: #667eea;
     min-height: 100vh;
     padding: 20px;
     display: flex;
