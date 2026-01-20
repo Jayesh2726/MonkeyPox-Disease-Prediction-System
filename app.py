@@ -25,7 +25,7 @@ app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
 # ==================== MODEL CONFIGURATION ====================
 # Define prediction categories and model information
-class_names = ['Measles', 'Monkeypox', 'Normal', 'Chickenpox']
+class_names = ['Chickenpox', 'Measles', 'Monkeypox', 'Normal']
 
 MODEL_INFO = {
     'title': 'Skin Disease Prediction System',
@@ -36,7 +36,7 @@ MODEL_INFO = {
 # Load the trained Keras model (.keras format)
 # Replace 'your_model.keras' with your actual model file path
 try:
-    MODEL_PATH = 'E:\MaxGen\git2025\MPDD\MonkeyPox-Disease-Prediction-System\MPDD176%.keras'
+    MODEL_PATH = 'MPDD176%.keras'
     model = keras.models.load_model(MODEL_PATH)
     MODEL_LOADED = True
     print(f"Model loaded successfully from {MODEL_PATH}")
