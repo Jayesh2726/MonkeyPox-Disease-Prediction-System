@@ -45,6 +45,8 @@ dataset/
 datasets/
 output_dataset/
 augmented/
+images/
+outputs/
 
 
 # ======================
