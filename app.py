@@ -36,7 +36,7 @@ MODEL_INFO = {
 # Load the trained Keras model (.keras format)
 # Replace 'your_model.keras' with your actual model file path
 try:
-    MODEL_PATH = 'E:\MaxGen\git2025\MPDD\MonkeyPox-Disease-Prediction-System\cnn_mpdd67%_optimized_model.keras'
+    MODEL_PATH = 'E:\MaxGen\git2025\MPDD\MonkeyPox-Disease-Prediction-System\MPDD176%.keras'
     model = keras.models.load_model(MODEL_PATH)
     MODEL_LOADED = True
     print(f"Model loaded successfully from {MODEL_PATH}")
