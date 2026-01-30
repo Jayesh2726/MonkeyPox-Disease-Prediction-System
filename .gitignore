@@ -52,6 +52,7 @@ Monkeypox Skin Image Dataset/
 dataset_split/
 uploads/
 dataset_split2/
+output2/
 
 # ======================
 # Model files
