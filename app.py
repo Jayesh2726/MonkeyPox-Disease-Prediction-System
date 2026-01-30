@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 import tensorflow as tf
 from tensorflow import keras
+from tensorflow.keras.applications.resnet50 import preprocess_input
 from datetime import datetime
 
 # Initialize Flask application
@@ -15,7 +16,7 @@ app = Flask(__name__)
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'bmp'}
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB max file size
-IMAGE_SIZE = (224, 224)  # Adjust based on your model's input size
+IMAGE_SIZE = (224, 224)  # ResNet50 standard input size
 
 # Create upload folder if it doesn't exist
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -24,36 +25,42 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE
 
 # ==================== MODEL CONFIGURATION ====================
-# Define prediction categories and model information
+# Define prediction categories (MUST match training order!)
 class_names = ['Chickenpox', 'Measles', 'Monkeypox', 'Normal']
 
 MODEL_INFO = {
     'title': 'Skin Disease Prediction System',
-    'description': 'This deep learning model uses a trained Keras neural network to analyze medical images and predict the likelihood of various skin conditions including Measles, Monkeypox, Normal skin, and Chickenpox.',
-    'instructions': 'Upload a clear image of the affected skin area in JPG, PNG, or GIF format. The image will be analyzed and a prediction with confidence scores will be provided.'
+    'description': 'This advanced deep learning model uses ResNet50 architecture with transfer learning to analyze medical images and predict the likelihood of various skin conditions including Measles, Monkeypox, Normal skin, and Chickenpox.',
+    'instructions': 'Upload a clear image of the affected skin area in JPG, PNG, or GIF format. The image will be analyzed using advanced AI and a prediction with confidence scores will be provided.'
 }
 
-# Load the trained Keras model (.keras format)
-# Replace 'your_model.keras' with your actual model file path
+# Load the trained Keras model (.h5 format)
 try:
-    MODEL_PATH = 'MPDD176%.keras'
+    MODEL_PATH = 'best_model.h5'
     model = keras.models.load_model(MODEL_PATH)
     MODEL_LOADED = True
-    print(f"Model loaded successfully from {MODEL_PATH}")
+    print(f"✅ Model loaded successfully from {MODEL_PATH}")
+    print(f"📊 Classes: {class_names}")
 except Exception as e:
-    print(f"Warning: Could not load model from {MODEL_PATH}: {e}")
-    print("Application will run but predictions will not be available.")
+    print(f"⚠️ Warning: Could not load model from {MODEL_PATH}: {e}")
+    print("❌ Application will run but predictions will not be available.")
     MODEL_LOADED = False
     model = None
 
 # ==================== UTILITY FUNCTIONS ====================
+
 def allowed_file(filename):
     """Check if uploaded file has an allowed extension."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def preprocess_image(image_path):
     """
-    Load and preprocess image for model prediction using OpenCV.
+    Load and preprocess image for ResNet50 model prediction.
+    EXACT same preprocessing as training code:
+    - Read image as BGR
+    - Resize to 224x224
+    - Apply preprocess_input() from ResNet50
+    - Expand dims for batch
     
     Args:
         image_path (str): Path to the image file
@@ -65,33 +72,32 @@ def preprocess_image(image_path):
         ValueError: If image cannot be loaded or processed
     """
     try:
-        # Read image using OpenCV
+        # Read image (BGR) - EXACT same as training
         img = cv2.imread(image_path)
         
         # Check if image was loaded successfully
         if img is None:
             raise ValueError("Failed to load image. Image may be corrupted or in unsupported format.")
         
-        # Resize to model's expected input size
+        # Resize to 224x224 (EXACT same as training)
         img = cv2.resize(img, IMAGE_SIZE)
         
-        # Convert BGR to RGB (OpenCV loads as BGR by default)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        # Preprocess using ResNet50 preprocessing (EXACT same as training)
+        # Note: img is BGR, not RGB - this is correct!
+        img_proc = img.astype(np.float32)
+        img_proc = preprocess_input(img_proc)
         
-        # Normalize pixel values to [0, 1] range
-        img = img / 255.0
+        # Add batch dimension (EXACT same as training)
+        img_batch = np.expand_dims(img_proc, axis=0)
         
-        # Add batch dimension (model expects 4D input: batch_size, height, width, channels)
-        img = np.expand_dims(img, axis=0)
-        
-        return img
+        return img_batch
     
     except Exception as e:
         raise ValueError(f"Error preprocessing image: {str(e)}")
 
 def make_prediction(image_array):
     """
-    Generate prediction from the model.
+    Generate prediction from the ResNet50 model.
     
     Args:
         image_array (np.array): Preprocessed image array
@@ -100,7 +106,7 @@ def make_prediction(image_array):
         dict: Prediction results with disease labels and confidence scores
     """
     try:
-        # Get model predictions
+        # Get model predictions (probabilities for each class)
         preds = model.predict(image_array, verbose=0)
         
         # Get the predicted class index (highest probability)
@@ -115,7 +121,7 @@ def make_prediction(image_array):
             for i in range(len(class_names))
         }
         
-        # Sort by confidence
+        # Sort by confidence (descending)
         sorted_probs = dict(sorted(class_probabilities.items(), key=lambda x: x[1], reverse=True))
         
         return {
@@ -128,6 +134,7 @@ def make_prediction(image_array):
         raise ValueError(f"Error during prediction: {str(e)}")
 
 # ==================== ROUTES ====================
+
 @app.route('/')
 def home():
     """Render the homepage."""
@@ -137,7 +144,7 @@ def home():
 def predict():
     """
     Handle image upload and return predictions.
-    Accepts both file uploads and JSON with image_path.
+    Uses the EXACT same preprocessing as your training code.
     
     Returns:
         JSON: Prediction results or error message
@@ -146,7 +153,7 @@ def predict():
     if not MODEL_LOADED:
         return jsonify({
             'success': False,
-            'error': 'Model is not loaded. Please ensure the model file exists.'
+            'error': 'Model is not loaded. Please ensure best_model.h5 exists in models/ folder.'
         }), 503
     
     image_path = None
@@ -192,7 +199,7 @@ def predict():
             }), 400
         
         try:
-            # Generate secure filename
+            # Generate secure filename with timestamp
             filename = secure_filename(f"{datetime.now().timestamp()}_{file.filename}")
             image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             
@@ -206,7 +213,7 @@ def predict():
             }), 400
     
     try:
-        # Preprocess image
+        # Preprocess image using EXACT same method as training
         img_array = preprocess_image(image_path)
         
         # Make prediction
@@ -217,7 +224,7 @@ def predict():
             try:
                 os.remove(image_path)
             except Exception as e:
-                print(f"Warning: Could not delete temporary file {image_path}: {e}")
+                print(f"⚠️ Warning: Could not delete temporary file {image_path}: {e}")
         
         # Return successful prediction
         return jsonify({
@@ -249,7 +256,23 @@ def get_classes():
     """Return available prediction classes."""
     return jsonify({'classes': class_names}), 200
 
+@app.route('/api/model-details')
+def get_model_details():
+    """Return detailed model information."""
+    return jsonify({
+        'model_name': 'ResNet50 Transfer Learning',
+        'architecture': 'ResNet50 + Dense Output Layer',
+        'input_size': list(IMAGE_SIZE),
+        'classes': class_names,
+        'num_classes': len(class_names),
+        'preprocessing': 'ResNet50 preprocessing (ImageNet normalization)',
+        'framework': 'TensorFlow/Keras',
+        'weights': 'ImageNet pretrained weights',
+        'training': 'Transfer learning with frozen base model'
+    }), 200
+
 # ==================== ERROR HANDLERS ====================
+
 @app.errorhandler(413)
 def request_entity_too_large(error):
     """Handle file too large error."""
@@ -275,7 +298,27 @@ def internal_error(error):
     }), 500
 
 # ==================== MAIN ====================
+
 if __name__ == '__main__':
-    # Run Flask development server
-    # Set debug=False in production
+    """
+    Run Flask development server
+    
+    Configuration:
+    - debug=True: Enable auto-reload and error debugging
+    - host='0.0.0.0': Allow external connections
+    - port=5000: Default Flask port
+    
+    For production, set debug=False and use a production WSGI server (Gunicorn)
+    """
+    print("=" * 60)
+    print("🚀 SKIN DISEASE PREDICTION SYSTEM")
+    print("=" * 60)
+    print(f"✅ Model Status: {'LOADED ✅' if MODEL_LOADED else 'FAILED ❌'}")
+    print(f"📊 Classes: {class_names}")
+    print(f"📐 Input Size: {IMAGE_SIZE}")
+    print("=" * 60)
+    print("🌐 Starting Flask server...")
+    print("📌 Access at: http://localhost:5000")
+    print("=" * 60)
+    
     app.run(debug=True, host='0.0.0.0', port=5000)
