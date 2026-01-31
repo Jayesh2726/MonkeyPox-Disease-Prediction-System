@@ -7,5 +7,5 @@ MODEL_PATH = Path("model.h5")
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
-MAX_FILE_SIZE = 10
+MAX_FILE_SIZE_MB = 10
 
