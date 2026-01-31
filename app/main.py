@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers.prediction import router as prediction_router
+from app.routes.predict import router as prediction_router
 
 app = FastAPI(
     title="Skin Disease Prediction API",

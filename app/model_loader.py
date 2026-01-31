@@ -1,4 +1,4 @@
-import tesorflow as tf
+import tensorflow as tf
 from app.config import MODEL_PATH
 
 model = None

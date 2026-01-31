@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from tensorflow.keras.applications.restnet50 import preprocess_input
+from tensorflow.keras.applications.resnet50 import preprocess_input
 from app.config import IMAGE_SIZE, CLASS_NAMES
 from app.model_loader import load_model
 
@@ -17,7 +17,7 @@ def preprocess_image(image_bytes: bytes):
     return np.expand_dims(img, axis=0)
 
 
-def predict_image(image_array):
+def predict_disease(image_array):
     """Predict the class of the image using the loaded model."""
     model = load_model()
     preds = model.predict(image_array, verbose=0)[0]
