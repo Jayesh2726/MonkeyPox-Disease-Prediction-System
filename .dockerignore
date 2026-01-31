@@ -1,0 +1,22 @@
+# Virtual environment
+venv/
+venv
+__pycache__
+*.pyc
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints
+
+# Old frontend (Flask)
+templates
+static
+app.py
+
+# Git
+.git
+.gitignore
+
+# Environment files
+.env
+.venv
