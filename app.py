@@ -36,7 +36,7 @@ MODEL_INFO = {
 
 # Load the trained Keras model (.h5 format)
 try:
-    MODEL_PATH = 'best_model.h5'
+    MODEL_PATH = 'model.h5'
     model = keras.models.load_model(MODEL_PATH)
     MODEL_LOADED = True
     print(f"✅ Model loaded successfully from {MODEL_PATH}")
